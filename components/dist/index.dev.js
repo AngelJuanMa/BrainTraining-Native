@@ -26,6 +26,6 @@ var _English = _interopRequireDefault(require("./English"));
 
 var _Lengua = _interopRequireDefault(require("./Lengua"));
 
-var _Memory = _interopRequireDefault(require("./memory/Memory"));
+var _Memory = _interopRequireDefault(require("./Memory"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }

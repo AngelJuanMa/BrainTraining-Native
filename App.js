@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createStackNavigator } from 'react-navigation-stack';
 import { English, Lengua, Memory } from './components';
 import { useFonts } from 'expo-font';
+import { Ionicons } from '@expo/vector-icons';
 
 const MemoryScreen = () => {
   let [fontsLoaded] = useFonts({
@@ -17,6 +18,15 @@ const MemoryScreen = () => {
       <Memory />
     </View>
   );
+}
+
+MemoryScreen.navigationOptions = {
+  drawerIcon: () => {
+    return <Ionicons name='ios-information-circle' size={25}/>
+  },
+  headerStyle: {
+    backgroundColor: '#f00',
+  },
 }
 
 const LenguaScreen = () => {
@@ -62,14 +72,8 @@ const AppNavigator = createBottomTabNavigator({
   })
 })
 
-const RootStack = createStackNavigator({
-  Main: AppNavigator,
-  MiModal: () => <></>
-}, {
-  headerMode: 'none',
-})
 
-export default createAppContainer(RootStack)
+export default createAppContainer(AppNavigator)
 
 const styles = StyleSheet.create({
   container: {
