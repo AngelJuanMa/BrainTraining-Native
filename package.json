@@ -6,10 +6,11 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "prod":"expo build:android"
-    },
+    "prod": "expo build:android"
+  },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.1.0",
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/masked-view": "0.1.10",
     "expo": "~40.0.0",
     "expo-font": "~8.4.0",
@@ -22,11 +23,11 @@
     "react-native-reanimated": "~1.13.0",
     "react-native-safe-area-context": "3.1.9",
     "react-native-screens": "~2.15.0",
+    "react-native-svg": "12.1.0",
     "react-native-web": "^0.13.18",
     "react-navigation": "^4.4.3",
     "react-navigation-stack": "^2.10.2",
-    "react-navigation-tabs": "^2.10.1",
-    "react-native-svg": "12.1.0"
+    "react-navigation-tabs": "^2.10.1"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",

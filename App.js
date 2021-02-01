@@ -1,32 +1,45 @@
-import React from 'react';
-import { Button, StyleSheet, StatusBar, Text, View } from 'react-native';
+import React, { useState, memo } from 'react';
+import { StyleSheet, Button, StatusBar, View } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createStackNavigator } from 'react-navigation-stack';
 import { English, Lengua, Memory } from './components';
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-community/async-storage';
 
+const setData = async () => {
+  try {
+    await AsyncStorage.multiSet([['hits', '0'], ['wrong', '0'], ['lastPoints', '0'], ['cantWN', '2'], ['record', '0'], ['lastSpeed', '1000']])
+  } catch (err) {
+    console.log(err)
+  }
+}
+const getData = () => { 
+  try {
+    AsyncStorage.multiGet(['hits', 'wrong', 'lastPoints', 'cantWN', 'record', 'lastSpeed']).then(response => {
+      setData()
+      if (!response[0][1] || !response[1][1] || !response[2][1],
+        !response[3][1] || !response[4][1] || !response[5][1]) {
+        setData()
+      }
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
+getData()
 const MemoryScreen = () => {
-  let [fontsLoaded] = useFonts({
-    'OpenSans-Bold': require('./assets/fonts/OpenSans-Bold.ttf'),
-  });
-
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#181818" />
+      <StatusBar
+        barStyle="light-content"
+        hidden={true}
+        backgroundColor="#181818"
+      />
       <Memory />
     </View>
   );
-}
-
-MemoryScreen.navigationOptions = {
-  drawerIcon: () => {
-    return <Ionicons name='ios-information-circle' size={25}/>
-  },
-  headerStyle: {
-    backgroundColor: '#f00',
-  },
 }
 
 const LenguaScreen = () => {
@@ -45,6 +58,7 @@ const EnglishScreen = () => {
   );
 }
 
+
 const AppNavigator = createBottomTabNavigator({
   MEMORIA: {
     screen: MemoryScreen,
@@ -58,6 +72,7 @@ const AppNavigator = createBottomTabNavigator({
 }, {
   defaultNavigationOptions: () => ({
     tabBarOptions: {
+      showLabel: true,
       activeTintColor: '#ffa521',
       inactiveTintColor: '#d17d04',
       labelStyle: {
@@ -65,8 +80,13 @@ const AppNavigator = createBottomTabNavigator({
         fontFamily: 'OpenSans-Bold',
       },
       style: {
-        paddingBottom: 10,
+        border: 'none',
+        paddingBottom: 11,
         backgroundColor: '#202020'
+      },
+      indicatorStyle: {
+        borderWidth: 1,
+        borderColor: 'red',
       }
     }
   })
