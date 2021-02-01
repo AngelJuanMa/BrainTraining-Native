@@ -5,7 +5,7 @@ import * as Font from 'expo-font';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import AsyncStorage from '@react-native-community/async-storage';
 
-const CountDownComponent = ({ starting, record, points }) => (
+const CountDownComponent = ({ starting, record, score }) => (
     <View View style={styles.sectionContainer} >
         <Text style={styles.boxContainer} >{record}</Text>
         <CountdownCircleTimer
@@ -26,9 +26,8 @@ const CountDownComponent = ({ starting, record, points }) => (
                 </Animated.Text>
             )}
         </CountdownCircleTimer >
-        <Text style={styles.boxContainer}>{points}</Text>
+        <Text style={styles.boxContainer}>{score}</Text>
     </View >
-
 )
 
 export default class Memory extends Component {
@@ -40,11 +39,13 @@ export default class Memory extends Component {
         cantWN: 4,
         speed: 1000,
         record: 0,
-        points: 100,
+        score: 100,
         hits: 0,
         wrongs: 0,
         answer: '',
-        question: 'algo'
+        question: '',
+        questionVisibility: true,
+        stopVisibilityInterval: [false],
     }
 
     loadFonts = async () => {
@@ -54,11 +55,75 @@ export default class Memory extends Component {
         this.setState({ fontsLoaded: true });
     }
 
-    getStorage = async () => {
-        AsyncStorage.multiGet(['hits', 'wrong', 'lastPoints', 'cantWN', 'record', 'lastSpeed']).then(response => {
-            console.log(response[2][1])
+    generateRandomStrings = () => {
+        var lista = []
+        var letras = 'abcdefghijklmnopqrstuvwxyz';
+        var numeros = '0123456789';
+        var characters = ''
+
+        if (this.state.letters) characters += letras;
+        if (this.state.numbers) characters += numeros;
+
+        //Saca un numero o letra aleatoria
+        var charactersLength = characters.length;
+        for (var i = 0; i < this.state.cantWN; i++) {
+            lista.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
+        }
+
+        this.setState({
+            question: lista,
+            questionVisibility: true
+        });
+    }
+
+    questVisibility = () => {
+        const timerVal = setTimeout(() => {
+            this.setState({ questionVisibility: false })
+        }, this.state.speed);
+    }
+
+    answerRandomStrings = () => {
+        let res = this.state.answer.current.value
+        this.setState({
+            answer: ''
+        })
+        if (res === this.state.question) {
+            this.changeSpeedAlgorithm("WELL");
+            let newPoints = (this.state.cantWN * 10) / (this.state.speed / 1000)
+            let points = (this.state.score + newPoints)
+            points = Math.round(points);
             this.setState({
-                points: JSON.parse(response[2][1]),
+                bien: this.state.bien + 1,
+                score: points,
+                stopVisibilityInterval: [hits + wrongs: true]
+            });
+        }
+        else {
+            this.changeSpeedAlgorithm("BAD");
+            this.setState({
+                mal: this.state.mal + 1,
+                stopVisibilityInterval: [hits + wrongs: true]
+            });
+        }
+
+        this.randomNumber();
+    }
+
+    start = () => {
+        this.generateRandomStrings()
+        this.questVisibility()
+    }
+
+    onChangeAnswer = (text) => {
+        this.setState({
+            answer: text
+        })
+    }
+
+    getStorage = async () => {
+        AsyncStorage.multiGet(['hits', 'wrong', 'lastScore', 'cantWN', 'record', 'lastSpeed']).then(response => {
+            this.setState({
+                score: JSON.parse(response[2][1]),
                 cantWN: JSON.parse(response[3][1]),
                 record: JSON.parse(response[4][1]),
                 lastSpeed: JSON.parse(response[5][1]),
@@ -77,18 +142,18 @@ export default class Memory extends Component {
             return (
 
                 <View>
-                    <CountDownComponent record={this.state.record} points={this.state.points} starting={this.state.inGame} />
+                    <CountDownComponent record={this.state.record} score={this.state.score} starting={this.state.inGame} />
                     {!this.state.inGame ?
 
                         <View style={styles.containPropieties}>
                             <View>
                                 <View style={styles.flewRow}>
-                                    <Text style={styles.textStyle}>Desaparecera en: {this.state.speed} s</Text>
+                                    <Text style={styles.textStyle}>Desaparecera en: {this.state.speed / 1000} s</Text>
                                     <View>
-                                        <TouchableOpacity onPress={() => { this.setState({ speed: this.state.speed + 1 }) }}>
+                                        <TouchableOpacity onPress={() => { this.setState({ speed: this.state.speed + 1000 }) }}>
                                             <Ionicons color={'white'} name='caret-up-outline' size={40} />
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => { if (this.state.speed > 1) this.setState({ speed: this.state.speed - 1 }) }} >
+                                        <TouchableOpacity onPress={() => { if (this.state.speed > 1) this.setState({ speed: this.state.speed - 1000 }) }} >
                                             <Ionicons color={'white'} name='caret-down-outline' size={40} />
                                         </TouchableOpacity>
                                     </View>
@@ -131,8 +196,12 @@ export default class Memory extends Component {
                                     <Text style={[styles.textStyle, styles.paddingTopSecond]}>Números</Text>
                                 </View>
                             </View>
-                            <TouchableOpacity style={styles.buttonStart}
-                                onPress={() => this.setState({ inGame: true })} >
+                            <TouchableOpacity
+                                style={styles.buttonStart}
+                                onPress={() => {
+                                    this.setState({ inGame: true })
+                                    this.start()
+                                }} >
                                 <Text style={styles.textStyle, styles.textButtonStart}>Empezar</Text>
                             </TouchableOpacity>
                         </View>
@@ -140,7 +209,10 @@ export default class Memory extends Component {
                         <View style={styles.containPropieties}>
                             <Text style={styles.textStyle, styles.hits}>{this.state.hits}</Text>
                             <Text style={styles.textStyle, styles.wrongs}>{this.state.wrongs}</Text>
-                            <Text style={styles.textStyle}>{this.state.question}</Text>
+                            {this.state.questionVisibility &&
+                               <Text style={styles.textStyle}>{this.state.question}</Text> 
+                            }
+                            
                             <TextInput
                                 autoCapitalize='none'
                                 autoCompleteType='off'
@@ -150,7 +222,7 @@ export default class Memory extends Component {
                                 maxLength={this.state.cantWN}
                                 placeholder='Respuesta'
                                 style={styles.input}
-                                onChangeText={text => onChangeAnswer(text)}
+                                onChangeText={text => this.onChangeAnswer(text)}
                                 value={this.state.answer}
                             />
                         </View>

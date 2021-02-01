@@ -10,15 +10,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 const setData = async () => {
   try {
-    await AsyncStorage.multiSet([['hits', '0'], ['wrong', '0'], ['lastPoints', '0'], ['cantWN', '2'], ['record', '0'], ['lastSpeed', '1000']])
+    await AsyncStorage.multiSet([['hits', '0'], ['wrong', '0'], ['lastScore', '0'], ['cantWN', '4'], ['record', '0'], ['lastSpeed', '1000']])
   } catch (err) {
     console.log(err)
   }
 }
 const getData = () => { 
   try {
-    AsyncStorage.multiGet(['hits', 'wrong', 'lastPoints', 'cantWN', 'record', 'lastSpeed']).then(response => {
-      setData()
+    AsyncStorage.multiGet(['hits', 'wrong', 'lastScore', 'cantWN', 'record', 'lastSpeed']).then(response => {
       if (!response[0][1] || !response[1][1] || !response[2][1],
         !response[3][1] || !response[4][1] || !response[5][1]) {
         setData()
